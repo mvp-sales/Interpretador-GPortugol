@@ -1,0 +1,39 @@
+algoritmo in2;
+
+variaveis
+    jogador : literal;
+    papel :  literal;
+    cartas_fascistas_mesa : inteiro;
+    chanceler_turno : literal;
+fim_variaveis
+
+inicio
+    
+	enquanto cartas_fascistas_mesa < 6 faca
+		imprima("Quem é o jogador atual?");
+		jogador := leia();
+
+		imprima("Quantas cartas fascistas ha na mesa?");
+		cartas_fascistas_mesa := leia();
+
+		imprima("Quem é o chanceler do turno?");
+		chanceler_turno := leia();
+		
+		se ehHitler(chanceler_turno) entao
+			se cartas_fascistas_mesa >= 3 entao
+				imprima("Hitler eh chanceler! Fascistas win");
+			senao
+				imprima("Continue a jogar, continue a jogar");
+			fim_se
+		fim_se
+	fim_enquanto
+fim
+
+funcao ehHitler(chanceler:literal) : logico
+inicio
+	se chanceler = "hitler_default" entao
+		retorne verdadeiro;
+	senao
+		retorne falso;
+	fim_se
+fim

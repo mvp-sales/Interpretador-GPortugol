@@ -1,0 +1,39 @@
+algoritmo trabbPardo_knuth;
+
+variaveis
+	S : matriz[11] de inteiros;
+	N : inteiro;
+	i : inteiro;
+	y : real;
+	temp : inteiro;
+	start : inteiro;
+fim_variaveis
+
+inicio
+	N := 11;
+	start := 0;
+	para i := 0 ate N-1 faca
+		S[i] = leia();
+	fim_para
+
+	// reverte o array S
+	para i := 0 ate N-1 faca
+		temp := S[start + i];
+		S[start + i] := S[N-i-1];
+		S[N-i-1] := temp;
+	fim_para
+
+	para i := 0 ate N-1 faca
+		y := f(S[i]);
+		se y > 400 entao
+			imprima(i," muito grande");
+		senao
+			imprima(y);
+		fim_se
+	fim_para
+fim
+
+funcao f(n:inteiro) : real
+inicio
+	retorne 5*n*n*n/3.141529;
+fim

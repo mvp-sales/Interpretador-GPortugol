@@ -1,0 +1,33 @@
+algoritmo bottlesOfBeer;
+
+variaveis
+	bottles_end : inteiro;
+	bottles_start : inteiro;
+	bottles : inteiro;
+fim_variaveis
+
+inicio
+	bottles_start := 99;
+	bottles_end := 1;
+	
+	para bottles := bottles_start ate bottles_end passo -1 faca
+		se bottles > 1 entao
+			imprima(bottles," bottles of beer on the wall, ",bottles," bottles of beer.");
+			imprima("Take one down, pass it around, ");
+			imprima(bottles - 1," bottles of beer on the wall.");
+		senao
+			imprima("1 bottle of beer on the wall, one bottle of beer.");
+			imprima("Take one down, pass it around, no more bottles of beer on the wall");
+			imprima("No more bottles of beer on the wall, no more bottles of beer.");
+			imprima("Go to the store and buy some more, 99 bottles of beer on the wall.");
+			bottles := buyMoreBottles(bottles);
+		fim_se
+	fim_para
+fim
+
+funcao buyMoreBottles(current_bottles: inteiro) : inteiro
+inicio
+	se current_bottles = 0 entao
+		retorne 99;
+	fim_se
+fim

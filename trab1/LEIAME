@@ -1,0 +1,19 @@
+Trabalho 1 de Compiladores - CComp 2016/1
+
+Alunos:
+	Gabriel Correa de Macena
+	Marcus Vinicius Palassi Sales
+
+Compilar arquivo flex (trab1.l):
+	-> Usar o makefile disponivel.
+	-> Executar na bash (./trab1 < nome_do_arquivo_de_entrada.gpt)
+
+Compilar arquivo Antlr (GPortugol.g4 e Trab1.java):
+	-> Editar o script disponivel (compAntlr.sh), mudando na linha 2 e na linha 3, os locais onde o Antlr esta localizado
+	para o local do seu computador.
+	-> Executar o script na bash (source compAntlr.sh)
+	-> Executar o programa (java Trab1 nome_do_arquivo_de_entrada.gpt)
+
+Foi utilizado um computador com Xubuntu 15.10 64-bit como SO para desenvolvimento e teste deste trabalho.
+
+	

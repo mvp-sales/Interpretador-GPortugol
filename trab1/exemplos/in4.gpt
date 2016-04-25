@@ -1,0 +1,30 @@
+algoritmo in4;
+
+variaveis
+    ki_Kakarotto : inteiro;
+fim_variaveis
+
+inicio
+	ki_Kakarotto := 8010;
+
+	/* Imprime dez vezes que o poder de luta do Kakarotto
+		eh de mais de 8000*/
+	enquanto ki_Kakarotto >= 8000 faca
+		imprima("Por favor, diga logo qual eh o poder de luta do Kakarotto.");
+		imprima(qualEhPoderDeLutaDoKakarotto(ki_Kakarotto));
+
+		se ki_Kakarotto > 8000 entao
+			imprima("O que? Mais de 8000? Isso soh pode ser um engano, essa maquina deve estar quebrada!");
+		fim_se
+
+		ki_Kakarotto--;
+	fim_enquanto
+fim
+
+funcao qualEhPoderDeLutaDoKakarotto(ki:inteiro) : literal
+inicio
+	se ki > 8000 entao
+		retorne "Argh, eh de mais de 8000!";
+	fim_se
+	retorne "meh";
+fim
