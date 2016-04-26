@@ -15,8 +15,9 @@ fragment DECIMAL : DIGITO+ ;
 
 prog : algoritmo;
 
-algoritmo 
-	: declaracao_algoritmo var_decl_block? stm_block func_decls*
+algoritmo
+	:	declaracao_algoritmo var_decl_block? stm_block func_decls+ EOF
+	|	declaracao_algoritmo var_decl_block? stm_block EOF
 	;
 
 declaracao_algoritmo 
