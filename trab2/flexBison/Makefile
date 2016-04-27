@@ -1,7 +1,11 @@
-all: trab1
+all: trab2
 
-lex.yy.c: trab1.l
-	flex -o lex.yy.c trab1.l
+parser.c: parser.y
+	bison -Wall --defines=parser.h -o parser.c parser.y
+	
+scanner.c: scanner.l
+	flex scanner.l
+	
+trab2: scanner.c parser.c
+	gcc -Wall parser.c scanner.c -o trab2 -ly
 
-trab1: lex.yy.c 
-	gcc lex.yy.c -o trab1
