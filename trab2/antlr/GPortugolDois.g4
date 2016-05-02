@@ -31,11 +31,11 @@ var_decl
 	;
 
 tp_primitivo 
-	:	'logico'	#TpLogico
-	|	'literal'	#TpLiteral
-	|	'caractere'	#TpCaractere
-	|	'real'		#TpReal
-	|	'inteiro'	#TpInteiro
+	:	'logico'	
+	|	'literal'	
+	|	'caractere'	
+	|	'real'		
+	|	'inteiro'	
 	;
 
 tp_matriz 
@@ -43,11 +43,11 @@ tp_matriz
 	;
 
 tp_prim_pl 
-	:	'logicos'		#TpPlLogicos
-	|	'literais'		#TpPlLiterais
-	|	'caracteres'	#TpPlCaracteres
-	|	'reais'			#TpPlReais
-	|	'inteiros'		#TpPlInteiros
+	:	'logicos'		
+	|	'literais'		
+	|	'caracteres'	
+	|	'reais'			
+	|	'inteiros'		
 	;
 
 stm_block
@@ -55,12 +55,12 @@ stm_block
 	;
 
 stm_list 
-	:	stm_para		#StmListPara
-	|	stm_enquanto	#StmListEnquanto
-	|	stm_se			#StmListSe
-	|	stm_ret			#StmListRet
-	|	fcall ';'		#StmListFCall
-	|	stm_attr		#StmListAttr
+	:	stm_para		
+	|	stm_enquanto	
+	|	stm_se			
+	|	stm_ret			
+	|	fcall ';'		
+	|	stm_attr		
 	;
 
 stm_ret
@@ -92,23 +92,23 @@ passo
 	;
 
 expr
-	:	('+'|'-'|'~'|'nao')? termo 		#UnaryTermo
-	|	expr ('/'|'*'|'%') expr			#MulDivMod
-	|	expr ('+'|'-') expr				#AddSub
-	|	expr ('>'|'>='|'<'|'<=') expr	#BiggerLessEqual
-	|	expr ('='|'<>') expr			#EqualDiff
-	|	expr '&' expr					#BitwiseAND
-	|	expr '^' expr					#BitwiseXOR
-	|	expr '|' expr					#BitwiseOR
-	|	expr ('e'|'&&') expr			#LogicalAND
-	|	expr ('ou'|'||') expr			#LogicalOR
+	:	('+'|'-'|'~'|'nao')? termo 		
+	|	expr ('/'|'*'|'%') expr			
+	|	expr ('+'|'-') expr				
+	|	expr ('>'|'>='|'<'|'<=') expr	
+	|	expr ('='|'<>') expr			
+	|	expr '&' expr					
+	|	expr '^' expr					
+	|	expr '|' expr					
+	|	expr ('e'|'&&') expr			
+	|	expr ('ou'|'||') expr			
 	;
 
 termo
-	:	'(' expr ')'	#ParenthesisExpr
-	|	literal 		#LiteralTerm
-	|	lvalue 			#LValueTerm
-	|	fcall 			#FCallTerm
+	:	'(' expr ')'	
+	|	literal 		
+	|	lvalue 			
+	|	fcall 			
 	;
 
 fcall
@@ -120,12 +120,12 @@ fargs
 	;
 
 literal
-	:	T_KW_FALSO		#LitFalso
-	|	T_KW_VERDADEIRO	#LitVerdadeiro
-	|	CARACTERE 		#LitCaractere
-	|	REAL 			#LitReal
-	|	INTEIRO 		#LitInteiro
-	|	STRING 			#LitString
+	:	T_KW_FALSO		
+	|	T_KW_VERDADEIRO	
+	|	CARACTERE 		
+	|	REAL 			
+	|	INTEIRO 		
+	|	STRING 			
 	;
 
 func_decls

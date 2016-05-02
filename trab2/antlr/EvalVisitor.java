@@ -1,186 +1,282 @@
 import java.util.*;
 import org.antlr.v4.runtime.tree.*;
 
-public class EvalVisitor extends GPortugolDoisBaseVisitor<Void>{
-	private int numberNodes = 0;
-	//private Stack<Map<Integer,String>> nodes;
-	//private Map<Integer,String> nodes = new HashMap<Integer,String>();
-	//Map<String,String>
-
-	/*@Override 
-	public String visitProg(GPortugolDoisParser.ProgContext ctx) { 
-		return "digraph {\n" + visitChildren(ctx) + "}"; 
-	}*/
+public class EvalVisitor extends GPortugolDoisBaseVisitor<Integer>{
+	private int numberNodes = 0;	
 
 	@Override 
-	public Void visitAlgFuncDecl(GPortugolDoisParser.AlgFuncDeclContext ctx) { 
+	public Integer visitAlgFuncDecl(GPortugolDoisParser.AlgFuncDeclContext ctx) { 
+		int thisNodeIndex = numberNodes;
 		System.out.println("digraph {\ngraph [ordering=\"out\"];");
-		for(ParseTree children : ctx.children){
-			//System.out.println(children.getText());
-
+		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_goal\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount()-1; i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		}
-		//System.out.println("node"+numberNodes+"[label=\"algoritmo_goal\"];\nnode"+numberNodes+" -> node0;");
-		return null;
+		System.out.println("}");
+		return 0;
 	}
 
 	@Override 
-	public Void visitAlgNoFuncDecl(GPortugolDoisParser.AlgNoFuncDeclContext ctx) { 
+	public Integer visitAlgNoFuncDecl(GPortugolDoisParser.AlgNoFuncDeclContext ctx) { 
+		int thisNodeIndex = numberNodes;
 		System.out.println("digraph {\ngraph [ordering=\"out\"];");
-		//visitChildren(ctx);
-		//System.out.println("node"+numberNodes+"[label=\"algoritmo_goal\"];\nnode"+numberNodes+" -> node0;");
-		//System.out.println(ctx.getText());
-		//nodes.put(numberNodes+1,ctx.getChild(0).getText());
-		for(ParseTree children : ctx.children){
-			//System.out.println(children.getText());
-			visit(children);
+		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_goal\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount()-1; i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		}
-		//visitChildren(ctx);
-		return null;
+		System.out.println("}");
+		return 0;
 	}
 	@Override 
-	public Void visitDeclAlg(GPortugolDoisParser.DeclAlgContext ctx) {
-		System.out.println("node0[label=\"algoritmo_decl\"];");
-		System.out.println("node1[label=\"algoritmo\"];\nnode0 -> node1;");
-		System.out.println("node2[label=\""+ ctx.getChild(1).getText()+"\"];\nnode0 -> node2;");
-		System.out.println("node3[label=\";\"];\nnode0 -> node3;");
-		numberNodes += 4;
-		return null; 
+	public Integer visitDeclAlg(GPortugolDoisParser.DeclAlgContext ctx) {
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_decl\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;
 	}
 
 	@Override 
-	public Void visitVarDeclBlock(GPortugolDoisParser.VarDeclBlockContext ctx) { 
-		System.out.println("node"+numberNodes+"[label=\"var_decl_block\"];");numberNodes++;
-		System.out.println("node"+numberNodes+"[label=\"variaveis\"];"); numberNodes++;
-		for(int i = 1; i < ctx.getChildCount() - 1; i++){
-			visit(ctx.getChild(i));
+	public Integer visitVarDeclBlock(GPortugolDoisParser.VarDeclBlockContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"var_decl_block\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		}
-		System.out.println("node"+numberNodes+"[label=\"fim_variaveis\"];"); numberNodes++;
-		return null; 
+		return thisNodeIndex; 
 	}
 
 	@Override 
-	public Void visitVarDecl(GPortugolDoisParser.VarDeclContext ctx) { 
-		System.out.println("node"+numberNodes+"[label=\""+ctx.getChild(0).getText()+"\"];");numberNodes++;
-		for(int i = 1; !ctx.getChild(i).getText().equals(":"); i++){
-			System.out.println("node"+numberNodes+"[label=\""+ctx.getChild(i).getText()+"\"];");numberNodes++;
+	public Integer visitVarDecl(GPortugolDoisParser.VarDeclContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"var_decl\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		}
-		System.out.println("node"+numberNodes+"[label=\":\"];");numberNodes++;
-		visit(ctx.getChild(ctx.getChildCount()-1));
-		return null;
+		return thisNodeIndex; 
 	}
 
 	@Override
-	public Void visitTerminal(TerminalNode node){
-		System.out.println(node.getText());
-		return null;
+	public Integer visitTerminal(TerminalNode node){
+		/*if(node.getSymbol().getType() == GPortugolDois.STRING){
+			System.out.println("LOL ACHEI UMA STRING");
+		}*/
+		System.out.println("node"+numberNodes+"[label=\""+node.getText()+"\"];");
+		return numberNodes++;
 	}
 
-	/*@Override public T visitTpLogico(GPortugolDoisParser.TpLogicoContext ctx) { return visitChildren(ctx); }
+	@Override public Integer visitTp_primitivo(GPortugolDoisParser.Tp_primitivoContext ctx) {
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"tp_primitivo\"];");numberNodes++;
+		int sonNodeIndex = visit(ctx.getChild(0));
+		System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		return thisNodeIndex; 
+	}
 
-	@Override public T visitTpLiteral(GPortugolDoisParser.TpLiteralContext ctx) { return visitChildren(ctx); }
+	@Override public Integer visitTpMatriz(GPortugolDoisParser.TpMatrizContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"tp_matriz\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
 
-	@Override public T visitTpCaractere(GPortugolDoisParser.TpCaractereContext ctx) { return visitChildren(ctx); }
+	@Override public Integer visitTp_prim_pl(GPortugolDoisParser.Tp_prim_plContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"tp_primitivo_pl\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
 
-	@Override public T visitTpReal(GPortugolDoisParser.TpRealContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpInteiro(GPortugolDoisParser.TpInteiroContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpMatriz(GPortugolDoisParser.TpMatrizContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpPlLogicos(GPortugolDoisParser.TpPlLogicosContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpPlLiterais(GPortugolDoisParser.TpPlLiteraisContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpPlCaracteres(GPortugolDoisParser.TpPlCaracteresContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpPlReais(GPortugolDoisParser.TpPlReaisContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitTpPlInteiros(GPortugolDoisParser.TpPlInteirosContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmBlock(GPortugolDoisParser.StmBlockContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmListPara(GPortugolDoisParser.StmListParaContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmListEnquanto(GPortugolDoisParser.StmListEnquantoContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmListSe(GPortugolDoisParser.StmListSeContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmListRet(GPortugolDoisParser.StmListRetContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmListFCall(GPortugolDoisParser.StmListFCallContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmListAttr(GPortugolDoisParser.StmListAttrContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmRet(GPortugolDoisParser.StmRetContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLValue(GPortugolDoisParser.LValueContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmAttr(GPortugolDoisParser.StmAttrContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmSe(GPortugolDoisParser.StmSeContext ctx) { return visitChildren(ctx); }
-	*/
-	@Override public Void visitStmEnquanto(GPortugolDoisParser.StmEnquantoContext ctx) { 
-		System.out.println(ctx.getChildCount());
-		//System.out.println(ctx.getText());
-		/*for(int i = 0; i < ctx.getChildCount(); i++){
-			System.out.println(ctx.getChild(i).getText());
-		}*/
-		return null; }
-
-	/*@Override public T visitStmPara(GPortugolDoisParser.StmParaContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitStmPasso(GPortugolDoisParser.StmPassoContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitEqualDiff(GPortugolDoisParser.EqualDiffContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitMulDivMod(GPortugolDoisParser.MulDivModContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitAddSub(GPortugolDoisParser.AddSubContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitBitwiseXOR(GPortugolDoisParser.BitwiseXORContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitBitwiseOR(GPortugolDoisParser.BitwiseORContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLogicalAND(GPortugolDoisParser.LogicalANDContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitUnaryTermo(GPortugolDoisParser.UnaryTermoContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitBitwiseAND(GPortugolDoisParser.BitwiseANDContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitBiggerLessEqual(GPortugolDoisParser.BiggerLessEqualContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLogicalOR(GPortugolDoisParser.LogicalORContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitParenthesisExpr(GPortugolDoisParser.ParenthesisExprContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLiteralTerm(GPortugolDoisParser.LiteralTermContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLValueTerm(GPortugolDoisParser.LValueTermContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFCallTerm(GPortugolDoisParser.FCallTermContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFCall(GPortugolDoisParser.FCallContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFArgs(GPortugolDoisParser.FArgsContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLitFalso(GPortugolDoisParser.LitFalsoContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLitVerdadeiro(GPortugolDoisParser.LitVerdadeiroContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLitCaractere(GPortugolDoisParser.LitCaractereContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLitReal(GPortugolDoisParser.LitRealContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLitInteiro(GPortugolDoisParser.LitInteiroContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitLitString(GPortugolDoisParser.LitStringContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFuncDecls(GPortugolDoisParser.FuncDeclsContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFVarDecl(GPortugolDoisParser.FVarDeclContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFParams(GPortugolDoisParser.FParamsContext ctx) { return visitChildren(ctx); }
-
-	@Override public T visitFParam(GPortugolDoisParser.FParamContext ctx) { return visitChildren(ctx); }*/
+	@Override public Integer visitStmBlock(GPortugolDoisParser.StmBlockContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_block\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitStm_list(GPortugolDoisParser.Stm_listContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_list\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitStmRet(GPortugolDoisParser.StmRetContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_ret\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitLValue(GPortugolDoisParser.LValueContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"lvalue\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitStmAttr(GPortugolDoisParser.StmAttrContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_attr\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitStmSe(GPortugolDoisParser.StmSeContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_se\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitStmEnquanto(GPortugolDoisParser.StmEnquantoContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_enquanto\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitStmPara(GPortugolDoisParser.StmParaContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"stm_para\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
+	
+	@Override public Integer visitStmPasso(GPortugolDoisParser.StmPassoContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"passo\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}	
+	
+	@Override public Integer visitExpr(GPortugolDoisParser.ExprContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"expr\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitTermo(GPortugolDoisParser.TermoContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"termo\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
+	
+	@Override public Integer visitFCall(GPortugolDoisParser.FCallContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"fCall\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
+	
+	@Override public Integer visitFArgs(GPortugolDoisParser.FArgsContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"fArgs\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitLiteral(GPortugolDoisParser.LiteralContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"Literal\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitFuncDecls(GPortugolDoisParser.FuncDeclsContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"func_Decls\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
+	
+	@Override public Integer visitFVarDecl(GPortugolDoisParser.FVarDeclContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"f_var_decl\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
+	
+	@Override public Integer visitFParams(GPortugolDoisParser.FParamsContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"f_params\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex; 
+	}
+	
+	@Override public Integer visitFParam(GPortugolDoisParser.FParamContext ctx) { 
+		int thisNodeIndex = numberNodes;
+		System.out.println("node"+thisNodeIndex+"[label=\"f_param\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount(); i++){
+			int sonNodeIndex = visit(ctx.getChild(i));
+			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
+		}
+		return thisNodeIndex;  
+	}
 	
 }
