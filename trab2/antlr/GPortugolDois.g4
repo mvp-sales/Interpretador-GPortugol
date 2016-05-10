@@ -156,19 +156,21 @@ T_KW_VERDADEIRO: 'verdadeiro';
 
 T_KW_FALSO: 'falso';
 
-OP_LOGICO : 'e'|'ou'|'nao'; 
+/*OP_LOGICO : 'e'|'ou'|'nao'; 
 
 OP_ARITMETICO : '+'| '-' |'*'|'/'|'%'|'++'|'--' ; 
 
 OP_RELACIONAL : '<'|'<='|'>'|'>='|'='|'<>' ;
+*/
 
-RESERVADA : 
+/*RESERVADA : 
 		'fim_variaveis' | 'algoritmo' | 'variaveis' | 'inteiro' 's'? 
 		| 'rea'('l'|'is')|'caractere' 's'? | 'litera'('l'|'is') | 'logico' 's'? 
 		| 'inicio' | 'fim' | 'se' | 'senao' | 'entao' 
 		| 'fim_'('se'|'enquanto'|'para') | 'enquanto' | 'faca' |'para' | 'de' 
 		| 'ate' | 'matriz' | 'funcao' | 'retorne' | 'passo'
 		;
+*/
 
 INTEIRO : HEXA | OCTAL | BINARIO | DECIMAL ; 
 

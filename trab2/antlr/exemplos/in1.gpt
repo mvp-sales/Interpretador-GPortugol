@@ -1,0 +1,23 @@
+algoritmo in1;
+
+variaveis
+    overrated : logico;
+    nome : literal;
+fim_variaveis
+
+inicio
+	nome := "bacon";
+	overrated := ehOverrated(nome);
+	enquanto(overrated = verdadeiro) faca
+		imprima("Bacon eh overrated? ",overrated);
+	fim_enquanto
+fim
+
+funcao ehOverrated(a:literal) : logico
+inicio
+	se a = "bacon" entao
+		retorne verdadeiro;
+	senao
+		retorne falso;
+	fim_se
+fim
