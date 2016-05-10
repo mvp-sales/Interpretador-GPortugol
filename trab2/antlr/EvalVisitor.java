@@ -2,9 +2,22 @@ import java.util.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+/*
+	Visitação da Parse Tree:
+
+		->	Visita o nó primário (algoritmo_goal), e faz uma visita aos filhos.
+		->	Caso o filho seja regra, a função visitRule é chamada, a regra é impressa,
+			os filhos desse filho são visitados, e assim por diante.
+		->	Caso o filho seja um terminal, a função visitTerminal é chamada e ele imprime
+			o nó.
+		->	Ao voltar para o pai, a ligação entre o pai e o filho é impressa.
+*/
+
 public class EvalVisitor extends GPortugolDoisBaseVisitor<Integer>{
-	// Variável para marcar o número de nós visitados e o índice de cada nó
-	// visitado.
+	/* 	
+		Variável para marcar o número de nós visitados e o índice de cada nó
+		visitado.
+	*/
 	private int numberNodes = 0;	
 
 	/*
@@ -20,6 +33,23 @@ public class EvalVisitor extends GPortugolDoisBaseVisitor<Integer>{
 			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		}
 		return thisNodeIndex;
+	}
+
+	@Override
+	public Integer visitTerminal(TerminalNode node){
+		/*
+			Adiciona backslashes a strings, para evitar erro durante o
+			processamento do arquivo .dot para pdf
+		*/
+		if(node.getSymbol().getType() == GPortugolDoisLexer.STRING){
+			String str = "\\"+node.getText();
+			str = new StringBuilder(str).insert(str.length()-1,"\\").toString();
+			System.out.println("node"+numberNodes+"[label=\""+str+"\"];");
+		}
+		else{
+			System.out.println("node"+numberNodes+"[label=\""+node.getText()+"\"];");
+		}
+		return numberNodes++;
 	}
 
 	@Override 
@@ -48,23 +78,6 @@ public class EvalVisitor extends GPortugolDoisBaseVisitor<Integer>{
 	@Override 
 	public Integer visitVarDecl(GPortugolDoisParser.VarDeclContext ctx) { 
 		return visitRule(ctx,"var_decl");
-	}
-
-	@Override
-	public Integer visitTerminal(TerminalNode node){
-		/*
-			Adiciona backslashes a strings, para evitar erro durante o
-			processamento do arquivo .dot para pdf
-		*/
-		if(node.getSymbol().getType() == GPortugolDoisLexer.STRING){
-			String str = "\\"+node.getText();
-			str = new StringBuilder(str).insert(str.length()-1,"\\").toString();
-			System.out.println("node"+numberNodes+"[label=\""+str+"\"];");
-		}
-		else{
-			System.out.println("node"+numberNodes+"[label=\""+node.getText()+"\"];");
-		}
-		return numberNodes++;
 	}
 
 	@Override public Integer visitTp_primitivo(GPortugolDoisParser.Tp_primitivoContext ctx) {

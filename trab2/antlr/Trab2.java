@@ -11,10 +11,18 @@ public class Trab2 {
             GPortugolDoisParser parser = new GPortugolDoisParser(tokens);
             ParseTree tree = parser.algoritmo(); // parse
 
-            EvalVisitor e = new EvalVisitor();
-            e.visit(tree);
+            /*
+                Caso não haja erros no processo de parsing, a visita à arvore ocorrerá.
+            */
+            if(parser.getNumberOfSyntaxErrors() == 0){
+                EvalVisitor e = new EvalVisitor();
+                e.visit(tree);
+            }
+            else{
+                System.err.println("Erro de sintaxe!!!");
+            }
         }
-        catch(IOException exc){
+        catch(Exception exc){
             exc.printStackTrace();
         }
 
