@@ -1,38 +1,20 @@
 import java.util.*;
 import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class EvalVisitor extends GPortugolDoisBaseVisitor<Integer>{
+	// Variável para marcar o número de nós visitados e o índice de cada nó
+	// visitado.
 	private int numberNodes = 0;	
 
-	@Override 
-	public Integer visitAlgFuncDecl(GPortugolDoisParser.AlgFuncDeclContext ctx) { 
+	/*
+		Recebe um contexto de uma regra e o nome da regra, imprime tal contexto
+		e visita os filhos de tal contexto, printando após a visita a ligaçao
+		entre o contexto inicial e seus filhos.
+	*/
+	private Integer visitRule(ParserRuleContext ctx,String nameRule){
 		int thisNodeIndex = numberNodes;
-		System.out.println("digraph {\ngraph [ordering=\"out\"];");
-		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_goal\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount()-1; i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		System.out.println("}");
-		return 0;
-	}
-
-	@Override 
-	public Integer visitAlgNoFuncDecl(GPortugolDoisParser.AlgNoFuncDeclContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("digraph {\ngraph [ordering=\"out\"];");
-		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_goal\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount()-1; i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		System.out.println("}");
-		return 0;
-	}
-	@Override 
-	public Integer visitDeclAlg(GPortugolDoisParser.DeclAlgContext ctx) {
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_decl\"];");numberNodes++;
+		System.out.println("node"+thisNodeIndex+"[label=\""+nameRule+"\"];");numberNodes++;
 		for(int i = 0; i < ctx.getChildCount(); i++){
 			int sonNodeIndex = visit(ctx.getChild(i));
 			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
@@ -41,242 +23,144 @@ public class EvalVisitor extends GPortugolDoisBaseVisitor<Integer>{
 	}
 
 	@Override 
-	public Integer visitVarDeclBlock(GPortugolDoisParser.VarDeclBlockContext ctx) { 
+	public Integer visitAlgoritmo(GPortugolDoisParser.AlgoritmoContext ctx) { 
 		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"var_decl_block\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
+		System.out.println("digraph {\ngraph [ordering=\"out\"];");
+		System.out.println("node"+thisNodeIndex+"[label=\"algoritmo_goal\"];");numberNodes++;
+		for(int i = 0; i < ctx.getChildCount()-1; i++){
 			int sonNodeIndex = visit(ctx.getChild(i));
 			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		}
-		return thisNodeIndex; 
+		System.out.println("}");
+		return 0;
+	}
+
+	@Override 
+	public Integer visitDeclAlg(GPortugolDoisParser.DeclAlgContext ctx) {
+		return visitRule(ctx,"algoritmo_decl");
+	}
+
+	@Override 
+	public Integer visitVarDeclBlock(GPortugolDoisParser.VarDeclBlockContext ctx) { 
+		return visitRule(ctx,"var_decl_block");
 	}
 
 	@Override 
 	public Integer visitVarDecl(GPortugolDoisParser.VarDeclContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"var_decl\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"var_decl");
 	}
 
 	@Override
 	public Integer visitTerminal(TerminalNode node){
-		/*if(node.getSymbol().getType() == GPortugolDois.STRING){
-			System.out.println("LOL ACHEI UMA STRING");
-		}*/
-		System.out.println("node"+numberNodes+"[label=\""+node.getText()+"\"];");
+		/*
+			Adiciona backslashes a strings, para evitar erro durante o
+			processamento do arquivo .dot para pdf
+		*/
+		if(node.getSymbol().getType() == GPortugolDoisLexer.STRING){
+			String str = "\\"+node.getText();
+			str = new StringBuilder(str).insert(str.length()-1,"\\").toString();
+			System.out.println("node"+numberNodes+"[label=\""+str+"\"];");
+		}
+		else{
+			System.out.println("node"+numberNodes+"[label=\""+node.getText()+"\"];");
+		}
 		return numberNodes++;
 	}
 
 	@Override public Integer visitTp_primitivo(GPortugolDoisParser.Tp_primitivoContext ctx) {
 		int thisNodeIndex = numberNodes;
 		System.out.println("node"+thisNodeIndex+"[label=\"tp_primitivo\"];");numberNodes++;
-		int sonNodeIndex = visit(ctx.getChild(0));
+		int sonNodeIndex = visitChildren(ctx);
 		System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		return thisNodeIndex; 
 	}
 
 	@Override public Integer visitTpMatriz(GPortugolDoisParser.TpMatrizContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"tp_matriz\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"tp_matriz");
 	}
 
 	@Override public Integer visitTp_prim_pl(GPortugolDoisParser.Tp_prim_plContext ctx) { 
 		int thisNodeIndex = numberNodes;
 		System.out.println("node"+thisNodeIndex+"[label=\"tp_primitivo_pl\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
+		int sonNodeIndex = visitChildren(ctx);
+		System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		return thisNodeIndex; 
 	}
 
 	@Override public Integer visitStmBlock(GPortugolDoisParser.StmBlockContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_block\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"stm_block");
 	}
 	
 	@Override public Integer visitStm_list(GPortugolDoisParser.Stm_listContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_list\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"stm_list");
 	}
 	
 	@Override public Integer visitStmRet(GPortugolDoisParser.StmRetContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_ret\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"stm_ret");
 	}
 	
 	@Override public Integer visitLValue(GPortugolDoisParser.LValueContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"lvalue\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"lvalue"); 
 	}
 	
 	@Override public Integer visitStmAttr(GPortugolDoisParser.StmAttrContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_attr\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"stm_attr");
 	}
 	
 	@Override public Integer visitStmSe(GPortugolDoisParser.StmSeContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_se\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"stm_se");
 	}
 	
 	@Override public Integer visitStmEnquanto(GPortugolDoisParser.StmEnquantoContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_enquanto\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"stm_enquanto");
 	}
 	
 	@Override public Integer visitStmPara(GPortugolDoisParser.StmParaContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"stm_para\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"stm_para");
 	}
 	
 	@Override public Integer visitStmPasso(GPortugolDoisParser.StmPassoContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"passo\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"passo");
 	}	
 	
 	@Override public Integer visitExpr(GPortugolDoisParser.ExprContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"expr\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"expr");
 	}
 	
 	@Override public Integer visitTermo(GPortugolDoisParser.TermoContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"termo\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"termo"); 
 	}
 	
 	@Override public Integer visitFCall(GPortugolDoisParser.FCallContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"fCall\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"fcall");
 	}
 	
 	@Override public Integer visitFArgs(GPortugolDoisParser.FArgsContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"fArgs\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"fargs");
 	}
 	
 	@Override public Integer visitLiteral(GPortugolDoisParser.LiteralContext ctx) { 
 		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"Literal\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
+		System.out.println("node"+thisNodeIndex+"[label=\"literal\"];");numberNodes++;
+		int sonNodeIndex = visitChildren(ctx);
+		System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
 		return thisNodeIndex; 
 	}
 	
 	@Override public Integer visitFuncDecls(GPortugolDoisParser.FuncDeclsContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"func_Decls\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"func_decls"); 
 	}
 	
 	@Override public Integer visitFVarDecl(GPortugolDoisParser.FVarDeclContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"f_var_decl\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"f_var_decl"); 
 	}
 	
 	@Override public Integer visitFParams(GPortugolDoisParser.FParamsContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"f_params\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex; 
+		return visitRule(ctx,"f_params");
 	}
 	
 	@Override public Integer visitFParam(GPortugolDoisParser.FParamContext ctx) { 
-		int thisNodeIndex = numberNodes;
-		System.out.println("node"+thisNodeIndex+"[label=\"f_param\"];");numberNodes++;
-		for(int i = 0; i < ctx.getChildCount(); i++){
-			int sonNodeIndex = visit(ctx.getChild(i));
-			System.out.println("node"+thisNodeIndex+" -> node"+sonNodeIndex+";");
-		}
-		return thisNodeIndex;  
+		return visitRule(ctx,"f_param");
 	}
 	
 }

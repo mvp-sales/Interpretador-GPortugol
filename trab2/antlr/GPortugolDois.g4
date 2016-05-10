@@ -14,8 +14,8 @@ fragment BINARIO : '0'[bB][01]+;
 fragment DECIMAL : DIGITO+ ;
 
 algoritmo
-	:	declaracao_algoritmo var_decl_block? stm_block func_decls+ EOF	#AlgFuncDecl
-	|	declaracao_algoritmo var_decl_block? stm_block EOF				#AlgNoFuncDecl
+	:	declaracao_algoritmo var_decl_block? stm_block func_decls+ EOF	
+	|	declaracao_algoritmo var_decl_block? stm_block EOF				
 	;
 
 declaracao_algoritmo 
@@ -75,6 +75,11 @@ stm_attr
 	:	lvalue ':=' expr ';'	#StmAttr
 	;
 
+
+/*
+	Para as estruturas de repetiçao, foi escolhido que a lista de comandos
+	(stm_list) pode ser vazia. 
+*/
 stm_se
 	:	'se' expr 'entao' stm_list* ('senao' stm_list*)? 'fim_se'	#StmSe
 	;
@@ -100,8 +105,8 @@ expr
 	|	expr '&' expr					
 	|	expr '^' expr					
 	|	expr '|' expr					
-	|	expr ('e'|'&&') expr			
-	|	expr ('ou'|'||') expr			
+	|	expr 'e' expr			
+	|	expr 'ou' expr			
 	;
 
 termo
