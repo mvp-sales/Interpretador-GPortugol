@@ -106,7 +106,8 @@ int node = 1;
 *       indicar que esse nó é filho do nó da cabeça.
 *       b. Se for um terminal, é preciso criar um novo nó com label igual ao nome/valor
 *       do terminal e só então associar esse nó como filho do nó da cabeça. O número do 
-*       nó estará preservado na variável $n correspondente à posição do terminal.
+*       nó e o seu nome/valor estarão presentes na variável $n correspondente à posição 
+*       do terminal.
 */
 
 algoritmo_goal: algoritmo_decl var_decl_block stm_block func_decls_list { 
@@ -701,28 +702,28 @@ expr: expr "ou" expr {
     printf("node%d -> node%d;\n", $$, $2);
     printf("node%d -> node%d;\n", $$, $3);
 }
-| '+' expr %prec UNARY { 
+| '+' termo %prec UNARY { 
     node++; $$ = node; node++;
     printf("node%d[label=\"expr\"];\n", $$);
     printf("node%d[label=\"+\"];\n", $1);
     printf("node%d -> node%d;\n", $$, $1);
     printf("node%d -> node%d;\n", $$, $2);
 }
-| '-' expr %prec UNARY { 
+| '-' termo %prec UNARY { 
     node++; $$ = node; node++;
     printf("node%d[label=\"expr\"];\n", $$);
     printf("node%d[label=\"-\"];\n", $1);
     printf("node%d -> node%d;\n", $$, $1);
     printf("node%d -> node%d;\n", $$, $2);
 }
-| '~' expr %prec UNARY { 
+| '~' termo %prec UNARY { 
     node++; $$ = node; node++;
     printf("node%d[label=\"expr\"];\n", $$);
     printf("node%d[label=\"~\"];\n", $1);
     printf("node%d -> node%d;\n", $$, $1);
     printf("node%d -> node%d;\n", $$, $2);
 }
-| "nao" expr %prec UNARY { 
+| "nao" termo %prec UNARY { 
     node++; $$ = node; node++;
     printf("node%d[label=\"expr\"];\n", $$);
     printf("node%d[label=\"nao\"];\n", $1);
