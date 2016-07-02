@@ -1,0 +1,21 @@
+Trabalho 3 de Compiladores - CComp 2016/1
+
+Alunos:
+	Gabriel Correa de Macena
+	Marcus Vinicius Palassi Sales
+
+As duas implementaçoes estao separadas em dois diretórios (antlr e bison).
+
+Compilar arquivo flex (scanner.l) e bison (parser.y):
+	-> Usar o makefile disponivel.
+	-> Executar na bash (./trab3 < nome_do_arquivo_de_entrada.gpt)
+
+Compilar arquivo Antlr (GPortugol.g4 e Trab3.java):
+	-> Editar o script disponivel (build.sh), mudando na linha 2 e na linha 3, os locais onde o Antlr esta localizado
+	para o local do seu computador.
+	-> Executar o script na bash (source build.sh)
+	-> Executar o programa (java Trab3 nome_do_arquivo_de_entrada.gpt)
+	-> Para remover todos os .class criados durante a compilaçao, use o script clear.sh (source clear.sh)
+
+Foram utilizados computadores com Xubuntu 15.10 64-bit e Windows 7 64-bit para desenvolvimento e testes deste trabalho. 
+
