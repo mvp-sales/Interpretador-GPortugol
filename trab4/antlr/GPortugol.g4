@@ -81,7 +81,8 @@ stm_attr
 	(stm_list) pode ser vazia.
 */
 stm_se
-	:	'se' expr 'entao' stm_list* ('senao' stm_list*)? 'fim_se'
+	:	'se' expr 'entao' stm_list* 'fim_se' #NormalIf
+	| 'se' expr 'entao' stm_list* 'senao' stm_list* 'fim_se'	#IfElse
 	;
 
 stm_enquanto
@@ -98,15 +99,15 @@ passo
 
 expr
 	:	(OP_ADD|OP_SUB|NAO_BINARIO|NAO_LOGICO)? termo
-	|	expr (OP_DIV|OP_MUL|OP_MOD) expr 
-	|	expr (OP_ADD|OP_SUB) expr 
+	|	expr (OP_DIV|OP_MUL|OP_MOD) expr
+	|	expr (OP_ADD|OP_SUB) expr
 	|	expr (OP_MORE|OP_MORE_EQUAL|OP_LESS|OP_LESS_EQUAL) expr
 	|	expr (OP_EQUAL|OP_DIFF) expr
 	|	expr E_BINARIO expr
-	|	expr XOR_BINARIO expr 
+	|	expr XOR_BINARIO expr
 	|	expr OU_BINARIO expr
-	|	expr E_LOGICO expr 
-	|	expr OU_LOGICO expr 
+	|	expr E_LOGICO expr
+	|	expr OU_LOGICO expr
 	;
 
 termo

@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.Token;
 public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
     AbstractSyntaxTree mainAST;
     //Map<String,AbstractSyntaxTree>
-    
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -16,7 +16,7 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 	@Override public AbstractSyntaxTree visitAlgoritmo(GPortugolParser.AlgoritmoContext ctx) {
         ast = visit(ctx.stm_block());
         /*for(GPortugolParser.Func_declsContext func : ctx.getChild(3)){
-            
+
         }*/
        return ast;
     }
@@ -39,7 +39,7 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public AbstractSyntaxTree visitStm_list(GPortugolParser.Stm_listContext ctx) {
-	    return visit(ctx.getChild(0)); 
+	    return visit(ctx.getChild(0));
 	}
 	/**
 	 * {@inheritDoc}
@@ -59,7 +59,7 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public AbstractSyntaxTree visitLvalue(GPortugolParser.LvalueContext ctx) {
-	    return new AbstractSyntaxTree(AST_NodeType.VARIAVEL,ctx.IDENTIFICADOR()); 
+	    return new AbstractSyntaxTree(AST_NodeType.VARIAVEL,ctx.IDENTIFICADOR());
 	}
 	/**
 	 * {@inheritDoc}
