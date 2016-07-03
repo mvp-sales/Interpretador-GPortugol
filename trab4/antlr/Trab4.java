@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import java.io.*;
+import java.util.*;
 
 public class Trab4 {
 	public static void main(String[] args) {
@@ -18,10 +19,13 @@ public class Trab4 {
                 AnalisadorSemantico analyser = new AnalisadorSemantico();
                 try{
                     analyser.visit(tree);
+					Map<String,VarsInfo> varsTable = analyser.getVarsTable();
+					Map<String,FunctionInfo> functionsTable = analyser.getFunctionsTable();
                     AST_Builder ast_builder = new AST_Builder();
-                    AbstractSyntaxTree ast = ast_builder.visit(tree);
-                    Runner runner = new Runner();
-                    runner.run(ast);
+                    AbstractSyntaxTree mainAST = ast_builder.visit(tree);
+					Map<String,AbstractSyntaxTree> functionsAST = ast_builder.getFunctionsAST();
+                    Runner runner = new Runner(varsTable,functionsTable,functionsAST);
+                    runner.run(mainAST);
                 }catch(ErroSemanticoException exc){
                     System.out.println(exc.getMessage());
                 }

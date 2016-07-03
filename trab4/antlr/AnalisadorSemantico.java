@@ -16,7 +16,7 @@ import org.antlr.v4.runtime.Token;
 				---> retorna logico
 			--> =, <> -> qualquer tipo (operandos soh podem ser diferentes quando forem numericos)
 				---> retorna logico
-			--> &, |, ^, ~, % (operadores binários e mod)-> inteiro 
+			--> &, |, ^, ~, % (operadores binários e mod)-> inteiro
 				---> retorna inteiro
 			--> e, ou, nao -> logico
 				---> retorna logico
@@ -50,7 +50,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 
 	/*
 		A analise semantica se dá em duas fases. Na primeira, o analisador
-		preenche as tabelas de variaveis e funçoes percorrendo o bloco de 
+		preenche as tabelas de variaveis e funçoes percorrendo o bloco de
 		declaraçoes de variaveis do bloco principal e percorrendo as declaraçoes
 		de funçoes e seus blocos de variaveis. Ao final desta fase, a variavel fase1
 		eh setada para true.
@@ -63,7 +63,13 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 	private boolean fase1 = false;
 
 
+	public Map<String,VarsInfo> getVarsTable(){
+		return this.varsTable;
+	}
 
+	public Map<String,FunctionInfo> getFunctionsTable(){
+		return this.functionTable;
+	}
 
 
 	@Override
@@ -141,7 +147,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 
 
 
-	@Override 
+	@Override
 	public TiposRetorno visitLvalue(GPortugolParser.LvalueContext ctx) {
 
 		int linhaDecl = ctx.getStart().getLine();
@@ -161,7 +167,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 
 
 
-	@Override 
+	@Override
 	public TiposRetorno visitStm_attr(GPortugolParser.Stm_attrContext ctx) {
 
 		int linhaDecl = ctx.getStart().getLine();
@@ -207,7 +213,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 		return true;
 	}
 
-	@Override 
+	@Override
 	public TiposRetorno visitStm_para(GPortugolParser.Stm_paraContext ctx) {
 		int linhaDecl = ctx.getStart().getLine();
 		TiposRetorno tipo_lvalue = visit(ctx.lvalue());
@@ -234,7 +240,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 	/*
 		Verificacao de expressoes
 	*/
-	@Override 
+	@Override
 	public TiposRetorno visitExpr(GPortugolParser.ExprContext ctx){
 
 		int linhaDecl = ctx.getStart().getLine();
@@ -319,7 +325,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 					}
 					ret = TiposRetorno.LOGICO;
 					break;
-					
+
 				/*
 					Expressao que aceita qualquer tipo de dados
 					Retorno : logico
@@ -370,7 +376,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 
 
 
-	@Override 
+	@Override
 	public TiposRetorno visitTermo(GPortugolParser.TermoContext ctx) {
 		if(ctx.expr() == null){
 			return visit(ctx.getChild(0));
@@ -386,7 +392,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 	/*
 		Contexto para verificacao de retornos de funcoes
 	*/
-	@Override 
+	@Override
 	public TiposRetorno visitStm_ret(GPortugolParser.Stm_retContext ctx){
 		int linhaDecl = ctx.getStart().getLine();
 		if(ctx.expr() != null){
@@ -413,7 +419,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 	/*
 		Verificaçao de chamada de funcao
 	*/
-	@Override 
+	@Override
 	public TiposRetorno visitFcall(GPortugolParser.FcallContext ctx) {
 		int linhaDecl = ctx.getStart().getLine();
 		String nomeFunc = ctx.IDENTIFICADOR().getText();
@@ -513,7 +519,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 
 
 
-	@Override 
+	@Override
 	public TiposRetorno visitLiteral(GPortugolParser.LiteralContext ctx) {
 		TiposRetorno ret;
 		Token lit = (Token)ctx.getChild(0).getPayload();
@@ -545,7 +551,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 		Visitacao da declaracao de funcao, preenchendo a tabela de funcao
 		ou visitando o bloco principal
 	*/
-	@Override 
+	@Override
 	public TiposRetorno visitFunc_decls(GPortugolParser.Func_declsContext ctx) {
 		/*
 			Caso a fase 1 nao esteja completa, insira essa funcao na tabela com seus dados
@@ -575,7 +581,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 			functionTable.put(nomeFunc,func);
 		}else{
 			/*
-				Caso a fase 1 esteja terminada, faça a verificacao semantica do 
+				Caso a fase 1 esteja terminada, faça a verificacao semantica do
 				bloco principal da funcao
 			*/
 			visit(ctx.stm_block());
