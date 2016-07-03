@@ -80,9 +80,12 @@ stm_attr
 	Para as estruturas de repetiçao, foi escolhido que a lista de comandos
 	(stm_list) pode ser vazia.
 */
-stm_se
+/*stm_se
 	:	'se' expr 'entao' stm_list* 'fim_se' #NormalIf
 	| 'se' expr 'entao' stm_list* 'senao' stm_list* 'fim_se'	#IfElse
+	;*/
+stm_se
+	:	'se' expr 'entao' stm_list* ('senao' stm_list*)? 'fim_se'
 	;
 
 stm_enquanto
@@ -98,7 +101,8 @@ passo
 	;
 
 expr
-	:	(OP_ADD|OP_SUB|NAO_BINARIO|NAO_LOGICO)? termo
+	:	opUnary=(OP_ADD|OP_SUB|NAO_BINARIO|NAO_LOGICO)? termo
+	//| (OP_ADD|OP_SUB|NAO_BINARIO|NAO_LOGICO)? termo
 	|	expr (OP_DIV|OP_MUL|OP_MOD) expr
 	|	expr (OP_ADD|OP_SUB) expr
 	|	expr (OP_MORE|OP_MORE_EQUAL|OP_LESS|OP_LESS_EQUAL) expr
