@@ -3,11 +3,13 @@ import java.util.*;
 public class Runner{
 
 	//Stack<Integer> pilha = new Stack<Integer>();
-	Stack<Object> pilha = new Stack<Object>();
-	Stack<Map<String,VarsInfo>> scopeStack = new Stack<Map<String,VarsInfo>>();
-	Map<String,VarsInfo> varsTable;
-	Map<String,FunctionInfo> functionsTable;
-	Map<String,AbstractSyntaxTree> functionsAST;
+	private Stack<Object> pilha = new Stack<Object>();
+	private Stack<Map<String,VarsInfo>> scopeStack = new Stack<Map<String,VarsInfo>>();
+	private Map<String,VarsInfo> varsTable;
+	private Map<String,FunctionInfo> functionsTable;
+	private Map<String,AbstractSyntaxTree> functionsAST;
+	private boolean returnFlag;
+
 
 
 	public Runner(Map<String,VarsInfo> varsTable,Map<String,FunctionInfo> functionsTable,Map<String,AbstractSyntaxTree> functionsAST){
@@ -15,6 +17,7 @@ public class Runner{
 		this.functionsTable = functionsTable;
 		this.functionsAST = functionsAST;
 		scopeStack.push(this.varsTable);
+		returnFlag = false;
 	}
 
 	private void evaluateExpression(AbstractSyntaxTree node){
@@ -117,6 +120,9 @@ public class Runner{
 			case BLOCK:
 				for(int i = 0; i < ast.getChildCount(); i++){
 					run(ast.getChild(i));
+					if(returnFlag){
+						return;
+					}
 				}
 				break;
 			case ATRIBUICAO:
@@ -144,7 +150,7 @@ public class Runner{
 				if(exprValueIf.booleanValue()){
 					run(ast.getChild(1));
 				}else{
-					if(ast.getChild(2) != null){
+					if(ast.getChildCount() == 3){
 						run(ast.getChild(2));
 					}
 				}
@@ -170,16 +176,30 @@ public class Runner{
 					run(ast.getChild(3));
 					passo = (Integer)pilha.pop();
 				}
-				for(var = start; var != limit; var = var + passo){
+				/*for(var = start; var != limit; var = var + passo){
 					variable.setValue(var);
 					run(ast.getChild(ast.getChildCount()-1));
 					var = variable.getValue();
 				}
 				variable.setValue(var);
-				run(ast.getChild(ast.getChildCount()-1));
+				run(ast.getChild(ast.getChildCount()-1));*/
+				if(start <= limit){
+					for(var = start; var <= limit; var = var + passo){
+						variable.setValue(var);
+						run(ast.getChild(ast.getChildCount()-1));
+						var = variable.getValue();
+					}
+				}else{
+					for(var = start; var >= limit; var = var + passo){
+						variable.setValue(var);
+						run(ast.getChild(ast.getChildCount()-1));
+						var = variable.getValue();
+					}
+				}
 				break;
 			case RETURN:
 				run(ast.getChild(0));
+				returnFlag = true;
 				return;
 			case LITERAL:
 				pilha.push(ast.getPayload().getText());
@@ -196,6 +216,7 @@ public class Runner{
 					AbstractSyntaxTree funcAST = functionsAST.get(nameFunc);
 					functionPrelude(ast.getChildCount());
 					run(funcAST);
+					returnFlag = false;
 					scopeStack.pop();
 				}
 				break;

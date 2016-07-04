@@ -49,7 +49,9 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 
 	@Override public AbstractSyntaxTree visitStm_ret(GPortugolParser.Stm_retContext ctx) {
 	    AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.RETURN,null);
-	    node.insertChild(visit(ctx.expr()));
+        if(ctx.expr() != null){
+	        node.insertChild(visit(ctx.expr()));
+        }
 	    return node;
 	}
 
@@ -78,8 +80,8 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 	        ifBlock.insertChild(visit(ctx.getChild(i)));
 	    }
 	    if(ctx.getChild(i).getText().equals("senao")){
-        AbstractSyntaxTree elseBlock = new AbstractSyntaxTree(AST_NodeType.BLOCK,null);
-        node.insertChild(elseBlock);
+            AbstractSyntaxTree elseBlock = new AbstractSyntaxTree(AST_NodeType.BLOCK,null);
+            node.insertChild(elseBlock);
 	        for(int j = i+1; (ctx.getChild(j) instanceof GPortugolParser.Stm_listContext) ; j++){
     	        elseBlock.insertChild(visit(ctx.getChild(j)));
     	    }
@@ -161,11 +163,6 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
       }
 
 
-
-	//@Override public AbstractSyntaxTree visitFargs(GPortugolParser.FargsContext ctx) { return visitChildren(ctx); }
-
-
-
 	@Override public AbstractSyntaxTree visitLiteral(GPortugolParser.LiteralContext ctx) {
         if(ctx.STRING() != null){
           return new AbstractSyntaxTree(AST_NodeType.LITERAL,ctx.STRING().getSymbol());
@@ -173,12 +170,4 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
         return new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol());
      }
 
-
-	//@Override public AbstractSyntaxTree visitFunc_decls(GPortugolParser.Func_declsContext ctx) { return visitChildren(ctx); }
-
-	//@Override public AbstractSyntaxTree visitFvar_decl(GPortugolParser.Fvar_declContext ctx) { return visitChildren(ctx); }
-
-	//@Override public AbstractSyntaxTree visitFparams(GPortugolParser.FparamsContext ctx) { return visitChildren(ctx); }
-
-	//@Override public AbstractSyntaxTree visitFparam(GPortugolParser.FparamContext ctx) { return visitChildren(ctx); }
 }
