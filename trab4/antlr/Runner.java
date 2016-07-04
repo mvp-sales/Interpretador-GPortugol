@@ -158,6 +158,26 @@ public class Runner{
 					exprValueWhile = (Boolean)pilha.pop();
 				}
 				break;
+			case FOR:
+				VarsInfo variable = currentScope.get(ast.getChild(0).getPayload().getText());
+				Integer var = variable.getValue();
+				run(ast.getChild(1));
+				Integer start = (Integer)pilha.pop();
+				run(ast.getChild(2));
+				Integer limit = (Integer)pilha.pop();
+				Integer passo = new Integer(1);
+				if(ast.getChildCount() > 4){
+					run(ast.getChild(3));
+					passo = (Integer)pilha.pop();
+				}
+				for(var = start; var != limit; var = var + passo){
+					variable.setValue(var);
+					run(ast.getChild(ast.getChildCount()-1));
+					var = variable.getValue();
+				}
+				variable.setValue(var);
+				run(ast.getChild(ast.getChildCount()-1));
+				break;
 			case RETURN:
 				run(ast.getChild(0));
 				return;

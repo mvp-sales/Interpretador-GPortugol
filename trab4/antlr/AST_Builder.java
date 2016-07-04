@@ -88,30 +88,6 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 	}
 
 
-  /*@Override
-  public AbstractSyntaxTree visitNormalIf(GPortugolParser.NormalIfContext ctx){
-    AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.IF,null);
-    node.insertChild(visit(ctx.expr()));
-    if(ctx.stm_list().size() > 1){
-
-  }
-
-    for(GPortugolParser.Stm_listContext elem : ctx.stm_list()){
-      node.insertChild(visit(elem));
-    }
-    return node;
-  }
-
-  @Override
-  public AbstractSyntaxTree visitIfElse(GPortugolParser.NormalIfContext ctx){
-    AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.IF,null);
-    node.insertChild(visit(ctx.expr()));
-    for(GPortugolParser.Stm_listContext elem : ctx.stm_list()){
-      node.insertChild(visit(elem));
-    }
-    return node;
-  }*/
-
 
 	@Override public AbstractSyntaxTree visitStm_enquanto(GPortugolParser.Stm_enquantoContext ctx) {
         AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.WHILE,null);
@@ -124,9 +100,30 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
         return node;
       }
 
-	//@Override public AbstractSyntaxTree visitStm_para(GPortugolParser.Stm_paraContext ctx) { return visitChildren(ctx); }
+	@Override public AbstractSyntaxTree visitStm_para(GPortugolParser.Stm_paraContext ctx) {
+        AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.FOR,null);
+        node.insertChild(visit(ctx.lvalue()));
+        node.insertChild(visit(ctx.expr(0)));
+        node.insertChild(visit(ctx.expr(1)));
+        if(ctx.passo() != null){
+            node.insertChild(visit(ctx.passo()));
+        }
+        AbstractSyntaxTree forBlock = new AbstractSyntaxTree(AST_NodeType.BLOCK,null);
+        for(GPortugolParser.Stm_listContext elem : ctx.stm_list()){
+            forBlock.insertChild(visit(elem));
+        }
+        node.insertChild(forBlock);
+        return node;
+    }
 
-	//@Override public AbstractSyntaxTree visitPasso(GPortugolParser.PassoContext ctx) { return visitChildren(ctx); }
+	@Override public AbstractSyntaxTree visitPasso(GPortugolParser.PassoContext ctx) {
+         if(ctx.op != null){
+             AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.OPERADOR,ctx.op);
+             node.insertChild(new AbstractSyntaxTree(AST_NodeType.INTEIRO,(Token)ctx.INTEIRO().getPayload()));
+             return node;
+         }
+         return new AbstractSyntaxTree(AST_NodeType.INTEIRO,(Token)ctx.INTEIRO().getPayload());
+    }
 
 	@Override public AbstractSyntaxTree visitExpr(GPortugolParser.ExprContext ctx) {
         if(ctx.termo() != null ){

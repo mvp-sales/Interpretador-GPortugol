@@ -80,10 +80,6 @@ stm_attr
 	Para as estruturas de repetiçao, foi escolhido que a lista de comandos
 	(stm_list) pode ser vazia.
 */
-/*stm_se
-	:	'se' expr 'entao' stm_list* 'fim_se' #NormalIf
-	| 'se' expr 'entao' stm_list* 'senao' stm_list* 'fim_se'	#IfElse
-	;*/
 stm_se
 	:	'se' expr 'entao' stm_list* ('senao' stm_list*)? 'fim_se'
 	;
@@ -97,7 +93,7 @@ stm_para
 	;
 
 passo
-	:	'passo' (OP_ADD|OP_SUB)? INTEIRO
+	:	'passo' op=(OP_ADD|OP_SUB)? INTEIRO
 	;
 
 expr
