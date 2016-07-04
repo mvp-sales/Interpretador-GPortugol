@@ -24,16 +24,6 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 
 
 	@Override public AbstractSyntaxTree visitStm_block(GPortugolParser.Stm_blockContext ctx) {
-	   /*if(ctx.stm_list().size() == 1){
-	       return visitChildren(ctx);
-	   }else if(ctx.stm_list().size() > 1){
-	       AbstractSyntaxTree block = new AbstractSyntaxTree(AST_NodeType.BLOCK,null);
-	       for(GPortugolParser.Stm_listContext elem : ctx.stm_list()){
-	           block.insertChild(visit(elem));
-	       }
-	       return block;
-	   }
-	   return null;*/
        AbstractSyntaxTree block = new AbstractSyntaxTree(AST_NodeType.BLOCK,null);
        for(GPortugolParser.Stm_listContext elem : ctx.stm_list()){
            block.insertChild(visit(elem));
@@ -121,10 +111,10 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 	@Override public AbstractSyntaxTree visitPasso(GPortugolParser.PassoContext ctx) {
          if(ctx.op != null){
              AbstractSyntaxTree node = new AbstractSyntaxTree(AST_NodeType.OPERADOR,ctx.op);
-             node.insertChild(new AbstractSyntaxTree(AST_NodeType.INTEIRO,(Token)ctx.INTEIRO().getPayload()));
+             node.insertChild(new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol()));
              return node;
          }
-         return new AbstractSyntaxTree(AST_NodeType.INTEIRO,(Token)ctx.INTEIRO().getPayload());
+         return new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol());
     }
 
 	@Override public AbstractSyntaxTree visitExpr(GPortugolParser.ExprContext ctx) {
@@ -164,10 +154,29 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 
 
 	@Override public AbstractSyntaxTree visitLiteral(GPortugolParser.LiteralContext ctx) {
+        //Token lit = (Token)ctx.getChild(0).getPayload();
+        //AbstractSyntaxTree node;
         if(ctx.STRING() != null){
           return new AbstractSyntaxTree(AST_NodeType.LITERAL,ctx.STRING().getSymbol());
         }
         return new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol());
+        /*
+        switch(lit.getType()){
+          case GPortugolParser.LITERAL:
+            node = new AbstractSyntaxTree(AST_NodeType.LITERAL,ctx.STRING().getSymbol());
+          case GPortugolParser.INTEIRO:
+            node = new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol());
+          case GPortugolParser.T_KW_FALSO:
+            node = new AbstractSyntaxTree(AST_NodeType.LOGICO,ctx.T_KW_FALSO().getSymbol());
+    			case GPortugolParser.T_KW_VERDADEIRO:
+            node = new AbstractSyntaxTree(AST_NodeType.LOGICO,ctx.T_KW_VERDADEIRO().getSymbol());
+          case GPortugolParser.CARACTERE:
+            node = new AbstractSyntaxTree(AST_NodeType.CARACTERE,ctx.CARACTERE().getSymbol());
+          case GPortugolParser.REAL:
+            node = new AbstractSyntaxTree(AST_NodeType.REAL,ctx.REAL().getSymbol());
+        }
+        return node;
+        */
      }
 
 }
