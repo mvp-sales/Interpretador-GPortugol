@@ -10,10 +10,27 @@ public class Runner{
 	*/
 
 	private Stack<Object> pilha = new Stack<Object>();
+
+	/*
+		Pilha de escopos, guardando a tabela de variáveis que deve ser usada
+		no escopo atual.
+	*/
 	private Stack<Map<String,VarsInfo>> scopeStack = new Stack<Map<String,VarsInfo>>();
+
+	/*
+		Tabelas de variáveis e de funções
+	*/
 	private Map<String,VarsInfo> varsTable;
 	private Map<String,FunctionInfo> functionsTable;
+	/*
+		Tabela de ASTs das funções
+	*/
 	private Map<String,AbstractSyntaxTree> functionsAST;
+
+	/*
+		Flag que indica que um return aconteceu. Propósito de evitar que uma execução de
+		função continue após tal return.
+	*/
 	private boolean returnFlag;
 
 
@@ -26,6 +43,9 @@ public class Runner{
 		returnFlag = false;
 	}
 
+	/*
+		Operações aritméticas e comparativas
+	*/
 	private void runArithmetics(String operator){
 		Integer i1 = (Integer)pilha.pop();
 		Integer i2 = (Integer)pilha.pop();
@@ -60,6 +80,9 @@ public class Runner{
 		}
 	}
 
+	/*
+		Operações lógicas
+	*/
 	private void runLogics(String operator){
 		Boolean b1 = (Boolean)pilha.pop();
 		Boolean b2 = (Boolean)pilha.pop();
@@ -70,6 +93,9 @@ public class Runner{
 		}
 	}
 
+	/*
+		Operadores unários
+	*/
 	private void runUnaryArithmetic(String symbol){
 		Integer i = (Integer)pilha.pop();
 		if(symbol.equals("+")){
@@ -79,7 +105,9 @@ public class Runner{
 		}
 	}
 
-	//It just works
+	/*
+		Operadores de igualdade e diferença
+	*/
 	private void runEqualDiff(String operator){
 		Object o1 = pilha.pop();
 		Object o2 = pilha.pop();
@@ -90,6 +118,9 @@ public class Runner{
 		}
 	}
 
+	/*
+		Avaliador de expressões
+	*/
 	private void evaluateExpression(AbstractSyntaxTree node){
 		if(node.getChildCount() > 1){
 			switch(node.getPayload().getText()){
@@ -127,10 +158,17 @@ public class Runner{
 		}
 	}
 
+	/*
+		Função imprima
+	*/
 	private void imprima(AbstractSyntaxTree ast){
 		String msg = "",tmp;
 		Boolean b;
 		for(int i = 0; i < ast.getChildCount(); i++){
+			/*
+				Tratamento para lógicos aparecerem como "verdadeiro" e "falso" em prints,
+				ao invés de "true" e "false"
+			*/
 			try{
 				b = (Boolean)pilha.peek();
 				pilha.pop();
@@ -144,22 +182,30 @@ public class Runner{
 		System.out.println(msg);
 	}
 
+	/*
+		Prelúdio de uma função (atribuição dos valores dos argumentos nos parâmetros
+		da função)
+	*/
 	private void functionPrelude(int aridade){
 		int i = 0;
 		Map<String,VarsInfo> currentScope = scopeStack.peek();
 		for(String name : currentScope.keySet()){
 			VarsInfo v = currentScope.get(name);
 			if(i < aridade){
-				// Change this later
-				//v.setValue((Integer)pilha.pop());
 				v.setValue(pilha.pop());
 				i++;
 			}else{
-				v.setValue(new Object());
+				/*
+					Atribuição de um valor padrão para as variáveis das funções
+				*/
+				v.setValue(0);
 			}
 		}
 	}
 
+	/*
+		Bloco se-então
+	*/
 	private void runIf(AbstractSyntaxTree ast){
 		run(ast.getChild(0));
 		Boolean exprValue = (Boolean)pilha.pop();
@@ -172,6 +218,9 @@ public class Runner{
 		}
 	}
 
+	/*
+		Bloco enquanto
+	*/
 	private void runWhile(AbstractSyntaxTree ast){
 		run(ast.getChild(0));
 		Boolean exprValue = (Boolean)pilha.pop();
@@ -182,19 +231,30 @@ public class Runner{
 		}
 	}
 
+	/*
+		Bloco para
+	*/
 	private void runFor(AbstractSyntaxTree ast){
+		/*
+			Escopo atual
+		*/
 		Map<String,VarsInfo> currentScope = scopeStack.peek();
 		VarsInfo variable = currentScope.get(ast.getChild(0).getPayload().getText());
+
 		Integer var = (Integer)variable.getValue();
+
 		run(ast.getChild(1));
 		Integer start = (Integer)pilha.pop();
+
 		run(ast.getChild(2));
 		Integer limit = (Integer)pilha.pop();
+
 		Integer passo = new Integer(1);
 		if(ast.getChildCount() > 4){
 			run(ast.getChild(3));
 			passo = (Integer)pilha.pop();
 		}
+
 		if(start <= limit){
 			for(var = start; var <= limit; var = var + passo){
 				variable.setValue(var);
@@ -210,6 +270,9 @@ public class Runner{
 		}
 	}
 
+	/*
+		Execução de funções
+	*/
 	private void runFunction(AbstractSyntaxTree ast){
 		for(int i = ast.getChildCount()-1; i >= 0; i--){
 			run(ast.getChild(i));
@@ -218,15 +281,24 @@ public class Runner{
 		if(nameFunc.equals("imprima")){
 			imprima(ast);
 		}else{
+			/*
+				Inserção da tabela de variáveis da função na pilha de escopos
+			*/
 			scopeStack.push(functionsTable.get(nameFunc).getFunctionVarsTable());
 			AbstractSyntaxTree funcAST = functionsAST.get(nameFunc);
 			functionPrelude(ast.getChildCount());
 			run(funcAST);
 			returnFlag = false;
+			/*
+				Acabada a função, retire a tabela de variáveis dela
+			*/
 			scopeStack.pop();
 		}
 	}
 
+	/*
+		Comandos de atribuição
+	*/
 	private void runAttr(AbstractSyntaxTree ast){
 		Map<String,VarsInfo> currentScope = scopeStack.peek();
 		run(ast.getChild(1));
@@ -235,12 +307,19 @@ public class Runner{
 		currentScope.get(nameVar).setValue(value);
 	}
 
+	/*
+		Função efetiva de run
+	*/
 	public void run(AbstractSyntaxTree ast){
 
 		switch(ast.getNodeType()){
 			case BLOCK:
 				for(int i = 0; i < ast.getChildCount(); i++){
 					run(ast.getChild(i));
+					/*
+						Caso algum nó tenha executado um return, não faça
+						nada após esse ponto.
+					*/
 					if(returnFlag){
 						return;
 					}
@@ -250,10 +329,16 @@ public class Runner{
 				runAttr(ast);
 				break;
 			case VARIAVEL:
+				/*
+					Empurre o valor da variável no escopo atual para a pilha
+				*/
 				Map<String,VarsInfo> currentScope = scopeStack.peek();
 				pilha.push(currentScope.get(ast.getPayload().getText()).getValue());
 				break;
 			case INTEIRO:
+				/*
+					Empurre o valor do inteiro para a pilha
+				*/
 				pilha.push(Integer.parseInt(ast.getPayload().getText()));
 				break;
 			case OPERADOR:
@@ -273,10 +358,15 @@ public class Runner{
 				runFor(ast);
 				break;
 			case RETURN:
-				run(ast.getChild(0));
+				if(ast.getChildCount() != 0){
+					run(ast.getChild(0));
+				}
 				returnFlag = true;
 				return;
 			case LITERAL:
+				/*
+					Retirar as aspas da string
+				*/
 				StringBuilder msg = new StringBuilder(ast.getPayload().getText());
 				msg.deleteCharAt(0);
 				msg.deleteCharAt(msg.length()-1);

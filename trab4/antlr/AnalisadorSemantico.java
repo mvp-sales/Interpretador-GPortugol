@@ -260,7 +260,7 @@ public class AnalisadorSemantico extends GPortugolBaseVisitor<TiposRetorno>{
 					*/
 					case GPortugolParser.OP_ADD:
 					case GPortugolParser.OP_SUB:
-						if(ret != TiposRetorno.INTEIRO || ret != TiposRetorno.REAL){
+						if(ret != TiposRetorno.INTEIRO && ret != TiposRetorno.REAL){
 							throw new ErroSemanticoException("Erro semantico na linha "+linhaDecl+
 								": expressão com tipos de dados incompatíveis.");
 						}
