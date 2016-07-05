@@ -1,15 +1,14 @@
 import java.util.*;
 
 /*
-	Classe que contém as principais informaçoes 
+	Classe que contém as principais informaçoes
 	relativas as variáveis
 */
 
 public class VarsInfo{
 	private int linhaDecl;
 	private TiposRetorno tipo;
-	//private Object value;
-	private Integer value;
+	private Object value;
 
 	public VarsInfo(TiposRetorno tipo,int linhaDecl){
 		this.tipo = tipo;
@@ -24,12 +23,11 @@ public class VarsInfo{
 		return tipo;
 	}
 
-	//public Object getValue(){
-	public Integer getValue(){
+	public Object getValue(){
 		return value;
 	}
 
-	public void setValue(Integer value){
+	public void setValue(Object value){
 		this.value = value;
 	}
 

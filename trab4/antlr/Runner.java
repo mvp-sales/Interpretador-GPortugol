@@ -2,6 +2,13 @@ import java.util.*;
 
 public class Runner{
 
+	/*
+		O que foi implementado:
+			-> Todo o básico
+			-> Estrutura for
+			-> Operações lógicas com outros tipos, exceto reais.
+	*/
+
 	private Stack<Object> pilha = new Stack<Object>();
 	private Stack<Map<String,VarsInfo>> scopeStack = new Stack<Map<String,VarsInfo>>();
 	private Map<String,VarsInfo> varsTable;
@@ -24,7 +31,7 @@ public class Runner{
 		Integer i2 = (Integer)pilha.pop();
 		switch(operator){
 			case "+":
-				pilha.push(i1+i2);
+				pilha.push(i2 + i1);
 				break;
 			case "-":
 				pilha.push(i2-i1);
@@ -121,21 +128,18 @@ public class Runner{
 	}
 
 	private void imprima(AbstractSyntaxTree ast){
-		String msg = "";
-		//StringBuilder topoPilha;
-		Integer i1;
+		String msg = "",tmp;
+		Boolean b;
 		for(int i = 0; i < ast.getChildCount(); i++){
-			/*try{
-				i1 = (Integer)pilha.peek();
+			try{
+				b = (Boolean)pilha.peek();
 				pilha.pop();
-				topoPilha = new StringBuilder(i1.toString());
+				if(b.booleanValue()) tmp = "verdadeiro";
+				else tmp = "falso";
 			}catch(ClassCastException c){
-				topoPilha = new StringBuilder(pilha.pop().toString());
-				topoPilha.deleteCharAt(0);
-				topoPilha.deleteCharAt(topoPilha.length()-1);
+				tmp = pilha.pop().toString();
 			}
-			msg += topoPilha.toString();*/
-			msg += pilha.pop().toString();
+			msg += tmp;
 		}
 		System.out.println(msg);
 	}
@@ -147,10 +151,11 @@ public class Runner{
 			VarsInfo v = currentScope.get(name);
 			if(i < aridade){
 				// Change this later
-				v.setValue((Integer)pilha.pop());
+				//v.setValue((Integer)pilha.pop());
+				v.setValue(pilha.pop());
 				i++;
 			}else{
-				v.setValue(0);
+				v.setValue(new Object());
 			}
 		}
 	}
@@ -180,7 +185,7 @@ public class Runner{
 	private void runFor(AbstractSyntaxTree ast){
 		Map<String,VarsInfo> currentScope = scopeStack.peek();
 		VarsInfo variable = currentScope.get(ast.getChild(0).getPayload().getText());
-		Integer var = variable.getValue();
+		Integer var = (Integer)variable.getValue();
 		run(ast.getChild(1));
 		Integer start = (Integer)pilha.pop();
 		run(ast.getChild(2));
@@ -194,13 +199,13 @@ public class Runner{
 			for(var = start; var <= limit; var = var + passo){
 				variable.setValue(var);
 				run(ast.getChild(ast.getChildCount()-1));
-				var = variable.getValue();
+				var = (Integer)variable.getValue();
 			}
 		}else{
 			for(var = start; var >= limit; var = var + passo){
 				variable.setValue(var);
 				run(ast.getChild(ast.getChildCount()-1));
-				var = variable.getValue();
+				var = (Integer)variable.getValue();
 			}
 		}
 	}
@@ -226,7 +231,7 @@ public class Runner{
 		Map<String,VarsInfo> currentScope = scopeStack.peek();
 		run(ast.getChild(1));
 		String nameVar = ast.getChild(0).getPayload().getText();
-		Integer value = (Integer)pilha.pop();
+		Object value = pilha.pop();
 		currentScope.get(nameVar).setValue(value);
 	}
 
@@ -280,18 +285,13 @@ public class Runner{
 			case FUNCTION:
 				runFunction(ast);
 				break;
-			/*
 			case LOGICO:
-				if(ast.getPayload().getText().equals("verdadeiro")) pilha.push(true);//pilha.push(Boolean.TRUE);
-				else pilha.push(false);//pilha.push(Boolean.FALSE);
+				if(ast.getPayload().getText().equals("verdadeiro")) pilha.push(true);
+				else pilha.push(false);
 				break;
 			case CARACTERE:
 				pilha.push(ast.getPayload().getText().charAt(1));
 				break;
-			case REAL:
-				pilha.push(Double.parseDouble(ast.getPayload().getText()));
-				break;
-			*/
 		}
 
 	}

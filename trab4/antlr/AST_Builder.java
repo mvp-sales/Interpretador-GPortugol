@@ -4,9 +4,20 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
+
+    /*
+        AST do programa principal
+    */
     AbstractSyntaxTree mainAST;
+
+    /*
+        ASTs das funcoes definidas
+    */
     Map<String,AbstractSyntaxTree> functionsAST = new HashMap<String,AbstractSyntaxTree>();
 
+    /*
+        Função que retorna o map que contém as ASTs das funções
+    */
     public Map<String,AbstractSyntaxTree> getFunctionsAST(){
         return functionsAST;
     }
@@ -154,29 +165,30 @@ public class AST_Builder extends GPortugolBaseVisitor<AbstractSyntaxTree>{
 
 
 	@Override public AbstractSyntaxTree visitLiteral(GPortugolParser.LiteralContext ctx) {
-        //Token lit = (Token)ctx.getChild(0).getPayload();
-        //AbstractSyntaxTree node;
-        if(ctx.STRING() != null){
-          return new AbstractSyntaxTree(AST_NodeType.LITERAL,ctx.STRING().getSymbol());
-        }
-        return new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol());
-        /*
+        Token lit = (Token)ctx.getChild(0).getPayload();
+        AbstractSyntaxTree node;
+
         switch(lit.getType()){
-          case GPortugolParser.LITERAL:
+          case GPortugolParser.STRING:
             node = new AbstractSyntaxTree(AST_NodeType.LITERAL,ctx.STRING().getSymbol());
+            break;
           case GPortugolParser.INTEIRO:
             node = new AbstractSyntaxTree(AST_NodeType.INTEIRO,ctx.INTEIRO().getSymbol());
+            break;
           case GPortugolParser.T_KW_FALSO:
             node = new AbstractSyntaxTree(AST_NodeType.LOGICO,ctx.T_KW_FALSO().getSymbol());
-    			case GPortugolParser.T_KW_VERDADEIRO:
+            break;
+    	  case GPortugolParser.T_KW_VERDADEIRO:
             node = new AbstractSyntaxTree(AST_NodeType.LOGICO,ctx.T_KW_VERDADEIRO().getSymbol());
-          case GPortugolParser.CARACTERE:
+            break;
+          default:
             node = new AbstractSyntaxTree(AST_NodeType.CARACTERE,ctx.CARACTERE().getSymbol());
-          case GPortugolParser.REAL:
-            node = new AbstractSyntaxTree(AST_NodeType.REAL,ctx.REAL().getSymbol());
+            break;
+          /*case GPortugolParser.REAL:
+            node = new AbstractSyntaxTree(AST_NodeType.REAL,ctx.REAL().getSymbol());*/
         }
         return node;
-        */
+
      }
 
 }

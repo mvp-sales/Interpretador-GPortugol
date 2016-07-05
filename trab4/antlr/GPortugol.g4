@@ -98,7 +98,6 @@ passo
 
 expr
 	:	opUnary=(OP_ADD|OP_SUB|NAO_BINARIO|NAO_LOGICO)? termo
-	//| (OP_ADD|OP_SUB|NAO_BINARIO|NAO_LOGICO)? termo
 	|	expr (OP_DIV|OP_MUL|OP_MOD) expr
 	|	expr (OP_ADD|OP_SUB) expr
 	|	expr (OP_MORE|OP_MORE_EQUAL|OP_LESS|OP_LESS_EQUAL) expr
